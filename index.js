@@ -42,7 +42,7 @@ function exec(command, options = {}) {
 }
 
 class EnvironmentChecksBase {
-  constructor({ messages = {}, ignoreErrors = [] }) {
+  constructor({ messages = {}, ignoreErrors = [] } = {}) {
     this.messages = messages;
     this.ignoreErrors = ignoreErrors;
     this.errors = [];
@@ -153,7 +153,7 @@ class EnvironmentChecksBase {
 }
 
 class EnvironmentChecks extends EnvironmentChecksBase {
-  constructor(data) {
+  constructor(data = {}) {
     const defaultMessages = {
       dotenv: ['', `You need to create the .env file with the correct values`],
       npm_auth: ['', `You need to login with npm`],
@@ -165,12 +165,11 @@ class EnvironmentChecks extends EnvironmentChecksBase {
     super({...data, messages: {...defaultMessages, ...data.messages}})
   }
 
-  checkDockerVersion([minVersion, maxVersion]) {
-    return this.checkVersion('docker', exec(`docker version --format '{{.Server.Version}}'`), [minVersion, maxVersion]);
-  }
+  checkDocker({docker: [minVersion, maxVersion], dockerCompose: [composeMinVersion, composeMaxVersion]}) {
+    print.log("******* :whale2: Check Docker versions :whale2: *******")
 
-  checkDockerComposeVersion([minVersion, maxVersion]) {
-    return this.checkVersion('docker_compose', exec(`docker-compose version --short`), [minVersion, maxVersion] );
+    this.checkVersion('docker', exec(`docker version --format '{{.Server.Version}}'`), [minVersion, maxVersion]);
+    this.checkVersion('docker_compose', exec(`docker-compose version --short`), [composeMinVersion, composeMaxVersion] );
   }
 }
 
