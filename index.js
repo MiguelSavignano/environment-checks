@@ -5,7 +5,6 @@ const axios = require('axios').default;
 const get = require('lodash.get');
 const { emojify } = require('node-emoji');
 const compareVersions = require('compare-versions');
-const HOME = process.env.WORKDIR_HOME || process.env.HOME;
 const shell = require('shelljs');
 
 function emojifyArguments(args) {
@@ -42,7 +41,7 @@ function exec(command, options = {}) {
     .trim();
 }
 
-class EnvironmentChecks {
+class EnvironmentChecksBase {
   constructor({ messages = {}, ignoreErrors = [] }) {
     this.messages = messages;
     this.ignoreErrors = ignoreErrors;
@@ -150,6 +149,28 @@ class EnvironmentChecks {
       this.errors.push(name);
       console.error(err);
     }
+  }
+}
+
+class EnvironmentChecks extends EnvironmentChecksBase {
+  constructor(data) {
+    const defaultMessages = {
+      dotenv: ['', `You need to create the .env file with the correct values`],
+      npm_auth: ['', `You need to login with npm`],
+      gcloud_config: ['', `You need to login with gcloud (gcloud auth application-default login)`],
+      docker: ['Docker :whale:', '(https://docs.docker.com/get-docker/)'],
+      docker_compose: ['Docker compose :whale: :whale:', '(https://docs.docker.com/compose/install/)'],
+      nginx: ['Ready for start nginx', 'Make sure stop your local nginx with (service nginx stop)'],
+    }
+    super({...data, messages: {...defaultMessages, ...data.messages}})
+  }
+
+  checkDockerVersion([minVersion, maxVersion]) {
+    return this.checkVersion('docker', exec(`docker version --format '{{.Server.Version}}'`), [minVersion, maxVersion]);
+  }
+
+  checkDockerComposeVersion([minVersion, maxVersion]) {
+    return this.checkVersion('docker_compose', exec(`docker-compose version --short`), [minVersion, maxVersion] );
   }
 }
 

@@ -10,14 +10,13 @@ const messages = {
   nginx: ['Ready for start nginx', 'Make sure stop your local nginx with (service nginx stop)'],
 }
 
-
 async function run() {
   const checks = new EnvironmentChecks({messages, ignoreErrors: []})
   print.platformInfo()
 
   print.log("******* :whale2: Check Docker versions :whale2: *******")
-  checks.checkVersion('docker', exec(`docker version --format '{{.Server.Version}}'`), ['20.10.1']);
-  checks.checkVersion('docker_compose', exec(`docker-compose version --short`), ['1.29.2', '2.0.0']);
+  checks.checkDockerVersion(['20.10.1']);
+  checks.checkDockerComposeVersion(['1.29.2', '2.0.0']);
   print.log("")
 
   print.log("******* :page_facing_up: Check configuration files :page_facing_up: *******")
