@@ -1,6 +1,6 @@
 ### EnvironmentChecks
 
-Check your environment validating program versions, configuration files, and port 80 available.
+Check your environment validating program versions, configuration files, and ports available.
 
 ### Docker versions
 
