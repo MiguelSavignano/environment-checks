@@ -1,4 +1,4 @@
-const { EnvironmentChecks, print } = require('../index')
+const { EnvironmentChecks, print } = require('../src/index')
 
 async function run() {
   const checks = new EnvironmentChecks()

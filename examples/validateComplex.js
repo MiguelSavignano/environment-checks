@@ -1,4 +1,4 @@
-const { EnvironmentChecks, print, exec } = require('../index')
+const { EnvironmentChecks, print, exec } = require('../src/index')
 const HOME = process.env.WORKDIR_HOME || process.env.HOME;
 
 const messages = {
