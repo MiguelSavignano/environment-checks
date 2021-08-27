@@ -1,6 +1,7 @@
 ### EnvironmentChecks
 
 Check your environment validating program versions, configuration files, and ports available.
+![Run](./screenshots/run.png)
 
 ### Docker versions
 
