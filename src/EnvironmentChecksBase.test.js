@@ -2,7 +2,10 @@ const { EnvironmentChecksBase } = require('./EnvironmentChecksBase');
 const { print } = require('./print');
 
 describe('EnvironmentChecksBase', () => {
-  let environmentChecks = new EnvironmentChecksBase();
+  let environmentChecks
+  beforeEach(() => {
+    environmentChecks = new EnvironmentChecksBase();
+  })
   test('#isSuccess', () => {
     expect(environmentChecks.isSuccess()).toEqual(true);
   });
@@ -58,4 +61,20 @@ describe('EnvironmentChecksBase', () => {
       expect(environmentChecks.errors).toEqual(['docker']);
     });
   });
+
+  describe('#checkFile', () => {
+    test('when file exists', () => {
+      const result = environmentChecks.checkFile('packageJson', './package.json');
+      expect(result).toEqual(true);
+    });
+    test('when file not exists', () => {
+      const spy = jest.spyOn(print, 'error');
+      const result = environmentChecks.checkFile('packageJson', './package-not-found.json');
+
+      expect(result).toEqual(false);
+      expect(spy).toHaveBeenCalled();
+      expect(environmentChecks.errors).toEqual(['packageJson']);
+    });
+  });
+
 });
