@@ -77,4 +77,12 @@ describe('EnvironmentChecksBase', () => {
     });
   });
 
+  describe('#checkAvailablePort', () => {
+    test('when port available', async () => {
+      const result = await environmentChecks.checkAvailablePort('nginx', 3000);
+
+      expect(result).toEqual(true);
+    });
+  });
+
 });
