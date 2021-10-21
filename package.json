@@ -14,5 +14,8 @@
     "lodash.get": "^4.4.2",
     "node-emoji": "^1.11.0",
     "shelljs": "^0.8.4"
+  },
+  "devDependencies": {
+    "jest": "^27.3.1"
   }
 }
