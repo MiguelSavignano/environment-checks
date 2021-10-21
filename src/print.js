@@ -19,14 +19,10 @@ const print = {
     console.error(...emojifyArguments(args));
   },
   platformInfo() {
-    print.log("******* :computer: Current environment :computer: *******")
-    print.log(
-      `  platform: ${os.platform()}\n  release: ${os.release()}\n  arch: ${exec(
-        'arch',
-      )}`,
-    );
-    print.log("")
+    print.log('******* :computer: Current environment :computer: *******');
+    print.log(`  platform: ${os.platform()}\n  release: ${os.release()}\n  arch: ${exec('arch')}`);
+    print.log('');
   },
 };
 
-module.exports = { print }
+module.exports = { print };
