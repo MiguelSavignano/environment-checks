@@ -85,4 +85,26 @@ describe('EnvironmentChecksBase', () => {
     });
   });
 
+  describe('#checkFileContains', () => {
+    test('when file contains', async () => {
+      const result = await environmentChecks.checkFileContains(
+        'packageJon',
+        './package.json',
+        `"main": "index.js"`
+      );
+
+      expect(result).toEqual(true);
+    });
+
+    test('when file not contains', async () => {
+      const result = await environmentChecks.checkFileContains(
+        'packageJon',
+        './package.json',
+        `NOT_EXISTS_CONTENT`
+      );
+
+      expect(result).toEqual(false);
+    });
+  });
+
 });

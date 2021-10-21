@@ -81,7 +81,7 @@ class EnvironmentChecksBase {
 
   async checkFileContains(name, source, content) {
     try {
-      if (!fs.readFileSync('/etc/hosts', 'utf-8').includes(fs.readFileSync(content))) {
+      if (!fs.readFileSync(source, 'utf-8').includes(content)) {
         print.error(
           `:x: [Error] The file ${source} not contains ${content} :loudspeaker:`,
           this.getMessages(name).failure
