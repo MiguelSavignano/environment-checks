@@ -48,11 +48,21 @@ class EnvironmentChecksBase {
   }
 
   checkVersion(name, currentVersion, [minVersion, maxVersion]) {
+    if(!currentVersion) {
+      print.error(
+        `:mega: [Error] Not found version for ${name}; check your installation of ${name} ${
+          this.getMessages(name).failure
+        }`,
+      );
+      this.errors.push(name);
+      return false
+    }
     const result = maxVersion
       ? compareVersions.compare(currentVersion, minVersion, '>=') &&
         compareVersions.compare(currentVersion, maxVersion, '<')
       : compareVersions.compare(currentVersion, minVersion, '>=');
     if (!result) {
+      console.log('**********************')
       print.error(
         `:mega: [Error] Not suported version ${currentVersion} for ${name}; Install the version ${minVersion} ${
           this.getMessages(name).failure
