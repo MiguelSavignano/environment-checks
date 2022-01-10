@@ -7,3 +7,5 @@ checks:
       min: '1.29.2'
       max: '2.0.0'
   - name: npm_auth
+  - name: available_port
+    port: 80

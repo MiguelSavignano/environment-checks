@@ -13,6 +13,7 @@ const file = fs.readFileSync('./environment-check.yaml', 'utf8')
 const configuration = YAML.parse(file)
 
 const messages = {
+  default: ['', ``],
   npm_auth: ['', `You need to login with npm`],
   docker: ['Docker :whale:', '(https://docs.docker.com/get-docker/)'],
   docker_compose: [
@@ -38,6 +39,9 @@ const checksPlugins = {
   },
   "npm_auth": () => {
     checks.checkFile('npm_auth', `${HOME}/.npmrc`);
+  },
+  "available_port": async () => {
+    await checks.checkAvailablePort('default', 80);
   }
 }
 
