@@ -1,0 +1,10 @@
+checks:
+  - use: version
+    run: node -v
+    version:
+      min: '14'
+    name: node
+    messages:
+     - 'NodeJs'
+     - 'of Nodejs'
+  - use: npm_auth
