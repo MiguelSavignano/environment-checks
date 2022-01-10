@@ -1,0 +1,9 @@
+checks:
+  - name: docker
+    version:
+      min: '20.10.1'
+  - name: docker-compose
+    version:
+      min: '1.29.2'
+      max: '2.0.0'
+  # - name: npm_auth

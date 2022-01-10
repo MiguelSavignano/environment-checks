@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+
+const { print, exec, EnvironmentChecks} = require('./index')
+const fs = require('fs')
+const YAML = require('yaml')
+
+if (!fs.existsSync('./environment-check.yaml')) {
+  process.exit(0)
+}
+
+const file = fs.readFileSync('./environment-check.yaml', 'utf8')
+const configuration = YAML.parse(file)
+
+const messages = {
+  npm_auth: ['', `You need to login with npm`],
+  docker: ['Docker :whale:', '(https://docs.docker.com/get-docker/)'],
+  docker_compose: [
+    'Docker compose :whale: :whale:',
+    '(https://docs.docker.com/compose/install/)',
+  ],
+};
+
+const checksPlugins = {
+  "docker": ({version: {min, max}}) => {
+    checks.checkVersion(
+      'docker',
+      exec(`docker version --format '{{.Server.Version}}'`),
+      max ? [min, max] : [min],
+    );
+  },
+  "docker-compose": ({version: {min, max}}) => {
+    checks.checkVersion(
+      'docker',
+      exec(`docker-compose version --short`),
+      max ? [min, max] : [min],
+    );
+  }
+}
+
+const checks = new EnvironmentChecks({ messages, ignoreErrors: [] });
+print.platformInfo();
+
+configuration.checks.forEach(({name, ...rest}) => {
+  if (checksPlugins[name]) {
+    checksPlugins[name](rest)
+  }
+})
