@@ -21,7 +21,7 @@ checks:
 ```
 
 ```
-npx environment-checks
+npx environment-checks https://raw.githubusercontent.com/MiguelSavignano/environment-checks/master/checks-files/node-14.yaml
 ```
 
 ### Custom validations
