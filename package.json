@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": "./src/cli",
   "scripts": {
     "test": "jest --collect-coverage"
   },
