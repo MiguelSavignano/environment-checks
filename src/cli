@@ -7,6 +7,7 @@ const YAML = require('yaml')
 if (!fs.existsSync('./environment-check.yaml')) {
   process.exit(0)
 }
+const { HOME } = process.env;
 
 const file = fs.readFileSync('./environment-check.yaml', 'utf8')
 const configuration = YAML.parse(file)
@@ -34,6 +35,9 @@ const checksPlugins = {
       exec(`docker-compose version --short`),
       max ? [min, max] : [min],
     );
+  },
+  "npm_auth": () => {
+    checks.checkFile('npm_auth', `${HOME}/.npmrc`);
   }
 }
 
