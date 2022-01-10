@@ -3,98 +3,71 @@
 Check your environment validating program versions, configuration files, and ports available.
 ![Run](./screenshots/run.png)
 
-### Docker versions
+### Check with config file
 
-```js
-const { EnvironmentChecks, print } = require('environment-checks');
+Example config file:
 
-async function run() {
-  const checks = new EnvironmentChecks();
-  print.platformInfo();
-  checks.checkDocker({
-    docker: ['20.10.1'],
-    dockerCompose: ['1.29.2', '2.0.0'],
-  });
-  checks.isSuccess()
-    ? print.log(`:heavy_check_mark: [Success] Ready :rocket::rocket::rocket:`)
-    : print.error(`:x: [Error] Not ready :disappointed:`);
-}
+```yaml
+checks:
+  - use: version
+    run: node -v
+    version:
+      min: '14'
+    name: node
+    messages:
+      - 'NodeJs'
+      - 'Intall version 14'
+  - use: npm_auth
+```
 
-run();
+```
+npx environment-checks
 ```
 
 ### Custom validations
 
 You can check this kind of checks:
 
-- checkFile
-- checkVersion
-- checkAvailablePort
+- version
+- available_port
 
-Validating program versions, configuration files, and port 80 available.
+```yaml
+checks:
+  - use: version
+    run: node -v
+    version:
+      min: '14'
+    name: node
+    messages:
+      - 'NodeJs'
+      - 'of Nodejs'
+  - use: available_port
+    port: 80
+    name: nginx
+    messages:
+      - 'Nginx'
+      - 'Close the process on port 80 (lsof -i :80)'
+```
 
-Example:
+### Available validations
 
-```js
-const { EnvironmentChecks, print, exec } = require('../src/index');
-const HOME = process.env.WORKDIR_HOME || process.env.HOME;
+- docker: Check min or max docker version
+- docker-compose: Check min or max docker-compose version
+- npm_auth: Check if exist ~/.npmrc file
 
-// messages for success message and failure message
-const messages = {
-  dotenv: ['', `You need to create the .env file with the correct values`],
-  npm_auth: ['', `You need to login with npm`],
-  gcloud_config: [
-    '',
-    `You need to login with gcloud (gcloud auth application-default login)`,
-  ],
-  docker: ['Docker :whale:', '(https://docs.docker.com/get-docker/)'],
-  docker_compose: [
-    'Docker compose :whale: :whale:',
-    '(https://docs.docker.com/compose/install/)',
-  ],
-  nginx: [
-    'Ready for start nginx',
-    'Make sure stop your local nginx with (service nginx stop)',
-  ],
-};
-
-async function run() {
-  const checks = new EnvironmentChecks({ messages, ignoreErrors: [] });
-  print.platformInfo();
-
-  print.log('******* :whale2: Check Docker versions :whale2: *******');
-  checks.checkVersion(
-    'docker',
-    exec(`docker version --format '{{.Server.Version}}'`),
-    ['20.10.1'],
-  );
-  checks.checkVersion(
-    'docker_compose',
-    exec(`docker-compose version --short`),
-    ['1.29.2', '2.0.0'],
-  );
-  print.log('');
-
-  print.log(
-    '******* :page_facing_up: Check configuration files :page_facing_up: *******',
-  );
-  checks.checkFile('dotenv', `.env`);
-  checks.checkFile('npm_auth', `${HOME}/.npmrc`);
-  checks.checkFile(
-    'gcloud_config',
-    `${HOME}/.config/gcloud/application_default_credentials.json`,
-  );
-
-  print.log('');
-
-  print.log('******* Check Nginx conf *******');
-  await checks.checkAvailablePort('nginx', 80);
-  print.log('');
-
-  checks.isSuccess()
-    ? print.log(`:heavy_check_mark: [Success] Ready :rocket::rocket::rocket:`)
-    : print.error(`:x: [Error] Not ready :disappointed:`);
-}
-
-run();
+```yaml
+checks:
+  - use: docker
+    version:
+      min: '20'
+  - use: docker-compose
+    version:
+      min: '1.29.2'
+      max: '2.0.0'
+  - use: npm_auth
+    port: 80
+    name: nginx
+    messages:
+      - 'Nginx'
+      - 'Close the process on port 80 (lsof -i :80)'
 ```
