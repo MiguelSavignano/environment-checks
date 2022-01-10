@@ -1,11 +1,23 @@
 checks:
-  - name: docker
+  - use: version
+    run: node -v
+    version:
+      min: '14'
+    name: node
+    messages:
+     - 'NodeJs'
+     - 'of Nodejs'
+  - use: docker
     version:
       min: '20.10.1'
-  - name: docker-compose
+  - use: docker-compose
     version:
       min: '1.29.2'
       max: '2.0.0'
-  - name: npm_auth
-  - name: available_port
+  - use: npm_auth
+  - use: available_port
     port: 80
+    name: nginx
+    messages:
+     - 'Nginx'
+     - ''

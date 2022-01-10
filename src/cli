@@ -23,6 +23,16 @@ const messages = {
 };
 
 const checksPlugins = {
+  "version": ({name, messages, run, version: {min, max}}) => {
+    if (name && messages) {
+      checks.messages = {...checks.messages, [name]: messages }
+    }
+    checks.checkVersion(
+      name,
+      exec(run),
+      max ? [min, max] : [min],
+    );
+  },
   "docker": ({version: {min, max}}) => {
     checks.checkVersion(
       'docker',
@@ -40,16 +50,19 @@ const checksPlugins = {
   "npm_auth": () => {
     checks.checkFile('npm_auth', `${HOME}/.npmrc`);
   },
-  "available_port": async () => {
-    await checks.checkAvailablePort('default', 80);
+  "available_port": async ({name, messages, port}) => {
+    if (name && messages) {
+      checks.messages = {...checks.messages, [name]: messages }
+    }
+    await checks.checkAvailablePort(name, port);
   }
 }
 
 const checks = new EnvironmentChecks({ messages, ignoreErrors: [] });
 print.platformInfo();
 
-configuration.checks.forEach(({name, ...rest}) => {
-  if (checksPlugins[name]) {
-    checksPlugins[name](rest)
+configuration.checks.forEach(({use, ...rest}) => {
+  if (checksPlugins[use]) {
+    checksPlugins[use](rest)
   }
 })
