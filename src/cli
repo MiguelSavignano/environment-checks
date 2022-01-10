@@ -3,14 +3,21 @@
 const { print, exec, EnvironmentChecks} = require('./index')
 const fs = require('fs')
 const YAML = require('yaml')
+const axios = require('axios')
 
-if (!fs.existsSync('./environment-check.yaml')) {
-  process.exit(0)
-}
 const { HOME } = process.env;
 
-const file = fs.readFileSync('./environment-check.yaml', 'utf8')
-const configuration = YAML.parse(file)
+async function loadConfigFile() {
+  if (process.argv[2]){
+    const { data } = await axios.get(process.argv[2])
+    return data
+  } else if (fs.existsSync('./environment-check.yaml')) {
+    return fs.readFileSync('./environment-check.yaml', 'utf8')
+  } else {
+    console.error("Not found configuration file")
+    process.exit(1)
+  }
+}
 
 const messages = {
   default: ['', ``],
@@ -22,47 +29,54 @@ const messages = {
   ],
 };
 
-const checksPlugins = {
-  "version": ({name, messages, run, version: {min, max}}) => {
-    if (name && messages) {
-      checks.messages = {...checks.messages, [name]: messages }
+async function run() {
+  const configText = await loadConfigFile()
+  const configuration = YAML.parse(configText)
+  const checks = new EnvironmentChecks({ messages, ignoreErrors: [] });
+
+  const checksPlugins = {
+    "version": ({name, messages, run, version: {min, max}}) => {
+      if (name && messages) {
+        checks.messages = {...checks.messages, [name]: messages }
+      }
+      checks.checkVersion(
+        name,
+        exec(run),
+        max ? [min, max] : [min],
+      );
+    },
+    "docker": ({version: {min, max}}) => {
+      checks.checkVersion(
+        'docker',
+        exec(`docker version --format '{{.Server.Version}}'`),
+        max ? [min, max] : [min],
+      );
+    },
+    "docker-compose": ({version: {min, max}}) => {
+      checks.checkVersion(
+        'docker',
+        exec(`docker-compose version --short`),
+        max ? [min, max] : [min],
+      );
+    },
+    "npm_auth": () => {
+      checks.checkFile('npm_auth', `${HOME}/.npmrc`);
+    },
+    "available_port": async ({name, messages, port}) => {
+      if (name && messages) {
+        checks.messages = {...checks.messages, [name]: messages }
+      }
+      await checks.checkAvailablePort(name, port);
     }
-    checks.checkVersion(
-      name,
-      exec(run),
-      max ? [min, max] : [min],
-    );
-  },
-  "docker": ({version: {min, max}}) => {
-    checks.checkVersion(
-      'docker',
-      exec(`docker version --format '{{.Server.Version}}'`),
-      max ? [min, max] : [min],
-    );
-  },
-  "docker-compose": ({version: {min, max}}) => {
-    checks.checkVersion(
-      'docker',
-      exec(`docker-compose version --short`),
-      max ? [min, max] : [min],
-    );
-  },
-  "npm_auth": () => {
-    checks.checkFile('npm_auth', `${HOME}/.npmrc`);
-  },
-  "available_port": async ({name, messages, port}) => {
-    if (name && messages) {
-      checks.messages = {...checks.messages, [name]: messages }
-    }
-    await checks.checkAvailablePort(name, port);
   }
+
+  print.platformInfo();
+
+  configuration.checks.forEach(({use, ...rest}) => {
+    if (checksPlugins[use]) {
+      checksPlugins[use](rest)
+    }
+  })
+
 }
-
-const checks = new EnvironmentChecks({ messages, ignoreErrors: [] });
-print.platformInfo();
-
-configuration.checks.forEach(({use, ...rest}) => {
-  if (checksPlugins[use]) {
-    checksPlugins[use](rest)
-  }
-})
+run()
